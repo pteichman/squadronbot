@@ -9,44 +9,60 @@ def main():
     for line in fileinput.input():
         lines.append(line.strip().upper())
 
-    lines = filter(goodname, lines)
+    # Restrict ourselves to the characters in glyphs.png.
+    lines = filter(lambda line: re.match(r"[-A-Z.' ]+$", line), lines)
+
+    # Learn the trigram model.
+    model = learn(lines)
+
+    # render only has room for 15 letters in a name.
+    names = filter(lambda line: len(line) < 16, lines)
 
     for _ in xrange(22):
-        oldname = random.choice(lines)
-        print " ".join(fixone(name) for name in oldname.split())
+        oldname = random.choice(names)
+        newname = fix(model, oldname)
+        print newname
 
 
-def goodname(name):
-    if not len(name) < 16:
-        return False
+def learn(lines):
+    model = {}
+    for line in lines:
+        line = " " + line + " "
+        for i in xrange(0, len(line)-3):
+            trigram = line[i:i+3]
+            index = trigram[0] + trigram[2]
+            value = model.get(index, "")
 
-    return re.match(r"[-A-Z.' ]+$", name)
+            if trigram[1] not in value:
+                model[index] = value + trigram[1]
+
+    return model
 
 
-def fixone(name):
-    runs = [
-        "DJ",
-        "EY",
-        "BDGHS",
-        "RP",
-        "TL",
-        "MN",
-    ]
+def fix(model, name):
+    name = " " + name + " "
 
-    oldname = newname = name
+    trigrams = []
+    for i in xrange(len(name)-2):
+        trigrams.append(name[i:i+3])
 
-    while oldname == newname:
-        pos = random.randint(0, len(name)-1)
-        oldchar = name[pos]
-        newchar = None
+    for _ in xrange(2):
+        index = random.randint(0, len(trigrams)-1)
 
-        for run in runs:
-            if oldchar in run:
-                newchar = random.choice(run)
-                newname = oldname[:pos] + newchar + oldname[pos+1:]
-                break
+        trigram = trigrams[index]
+        if trigram[1] == " ":
+            continue
 
-    return newname
+        options = model[trigram[0] + trigram[2]]
+
+        choice = random.choice(options)
+        if choice in " .-'":
+            continue
+
+        newtrigram = trigram[0] + choice + trigram[1]
+        trigrams[index] = newtrigram
+
+    return "".join(trigram[1] for trigram in trigrams)
 
 
 if __name__ == "__main__":
