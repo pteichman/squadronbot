@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import fileinput
+import random
+import re
+
+def main():
+    lines = []
+    for line in fileinput.input():
+        lines.append(line.strip().upper())
+
+    lines = filter(goodname, lines)
+
+    for _ in xrange(22):
+        oldname = random.choice(lines)
+        print " ".join(fixone(name) for name in oldname.split())
+
+
+def goodname(name):
+    return len(name) < 16 and re.match("^[A-Z ]+$", name)
+
+
+def fixone(name):
+    runs = [
+        "DJ",
+        "EY",
+        "BDGHS",
+        "RP",
+        "TL",
+        "MN",
+    ]
+
+    oldname = newname = name
+
+    while oldname == newname:
+        pos = random.randint(0, len(name)-1)
+        oldchar = name[pos]
+        newchar = None
+
+        for run in runs:
+            if oldchar in run:
+                newchar = random.choice(run)
+                newname = oldname[:pos] + newchar + oldname[pos+1:]
+                break
+
+    return newname
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+
+import fileinput
+
+from PIL import Image
+
+def main():
+    names = [ line.strip() for line in fileinput.input() ]
+
+    index = " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    sprite = Image.open("glyphs.png")
+
+    glyphs = {}
+    for i, char in enumerate(index):
+        box = (i*16, 0, (i+1)*16, 16)
+        glyphs[char] = sprite.crop(box)
+
+    # margins are 38 x 30, spacing between columns is 38,
+    # glyphs are 16 x 16
+    canvas = Image.new("RGB", (600, 280), getcolor(sprite, (0, 0)))
+
+    pos = (38, 30)
+    for i, name in enumerate(names):
+        for j, char in enumerate(name):
+            canvas.paste(glyphs[char], (pos[0]+16*j, pos[1]))
+
+        if i == 10:
+            pos = (332, 30)
+        else:
+            pos = (pos[0], pos[1]+20)
+
+    canvas.quantize(colors=3).save("output.png", "PNG", optimize=True, bits=2)
+
+
+def getcolor(img, pos):
+    # Grab the background fill color from the glyphs image.
+    palette = img.getpalette()
+    if palette is not None:
+        bg_index = img.getpixel((0, 0))
+        return tuple(palette[3*bg_index:3*bg_index+3])
+
+    return img.getpixel((0, 0))
+
+
+if __name__ == "__main__":
+    main()
