@@ -17,7 +17,10 @@ def main():
 
 
 def goodname(name):
-    return len(name) < 16 and re.match("^[A-Z ]+$", name)
+    if not len(name) < 16:
+        return False
+
+    return re.match(r"[-A-Z.' ]+$", name)
 
 
 def fixone(name):
