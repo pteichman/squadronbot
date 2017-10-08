@@ -7,7 +7,7 @@ from PIL import Image
 def main():
     names = [ line.strip() for line in fileinput.input() ]
 
-    index = " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    index = " ABCDEFGHIJKLMNOPQRSTUVWXYZ'-."
     sprite = Image.open("glyphs.png")
 
     glyphs = {}
