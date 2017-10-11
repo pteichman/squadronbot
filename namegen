@@ -30,13 +30,22 @@ def learn(lines):
         line = " " + line + " "
         for i in xrange(0, len(line)-3):
             trigram = line[i:i+3]
-            index = trigram[0] + "_" + trigram[2]
-            value = model.get(index, "")
+            index = trigram[0] + chartype(trigram[1]) + trigram[2]
 
+            value = model.get(index, "")
             if trigram[1] not in value:
-                model[index] = value + trigram[1]
+                model[index] = "".join(sorted(value + trigram[1]))
 
     return model
+
+
+def chartype(c):
+    if c in "AEIOUY":
+        return "v"
+    if c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
+        return "c"
+    return c
+
 
 
 def fix(model, name):
@@ -46,23 +55,23 @@ def fix(model, name):
     for i in xrange(len(name)-2):
         trigrams.append(name[i:i+3])
 
-    for _ in xrange(2):
+    while True:
         index = random.randint(0, len(trigrams)-1)
-
         trigram = trigrams[index]
-        if trigram[1] == " ":
-            continue
 
-        options = model[trigram[0] + "_" + trigram[2]]
+        key = trigram[0] + chartype(trigram[1]) + trigram[2]
+        if key not in model:
+            continue
+        options = model[key]
 
         choice = random.choice(options)
-        if choice in " .-'":
+        if choice == trigram[1]:
             continue
 
         newtrigram = trigram[0] + choice + trigram[1]
         trigrams[index] = newtrigram
 
-    return "".join(trigram[1] for trigram in trigrams)
+        return "".join(trigram[1] for trigram in trigrams)
 
 
 if __name__ == "__main__":
