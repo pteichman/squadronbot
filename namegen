@@ -30,7 +30,7 @@ def learn(lines):
         line = " " + line + " "
         for i in xrange(0, len(line)-3):
             trigram = line[i:i+3]
-            index = trigram[0] + trigram[2]
+            index = trigram[0] + "_" + trigram[2]
             value = model.get(index, "")
 
             if trigram[1] not in value:
@@ -53,7 +53,7 @@ def fix(model, name):
         if trigram[1] == " ":
             continue
 
-        options = model[trigram[0] + trigram[2]]
+        options = model[trigram[0] + "_" + trigram[2]]
 
         choice = random.choice(options)
         if choice in " .-'":
