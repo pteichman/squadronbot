@@ -29,7 +29,18 @@ def main():
         else:
             pos = (pos[0], pos[1]+20)
 
-    canvas.quantize(colors=3).save("output.png", "PNG", optimize=True, bits=2)
+    # Twitter will keep an image as a PNG if it has any pixels with
+    # any level of transparency. Otherwise it uses a JPEG. We're
+    # seeing JPEG artifacts when uploading an opaque png8, so adjust
+    # the opacity of pixel (0,0) to force a PNG.
+    alpha = Image.new("L", canvas.size)
+    for x in xrange(alpha.size[0]):
+        for y in xrange(alpha.size[1]):
+            alpha.putpixel((x, y), 255)
+    alpha.putpixel((0, 0), 254)
+
+    canvas.putalpha(alpha)
+    canvas.quantize(colors=4).save("output.png", "PNG", optimize=True, bits=4)
 
 
 def getcolor(img, pos):
