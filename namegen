@@ -10,25 +10,25 @@ def main():
         lines.append(line.strip().upper())
 
     # Restrict ourselves to the characters in glyphs.png.
-    lines = filter(lambda line: re.match(r"[-A-Z.' ]+$", line), lines)
+    lines = [line for line in lines if re.match(r"[-A-Z.' ]+$", line)]
 
     # Learn the trigram model.
     model = learn(lines)
 
     # render only has room for 15 letters in a name.
-    names = filter(lambda line: len(line) < 16, lines)
+    names = [line for line in lines if len(line) < 16]
 
-    for _ in xrange(22):
+    for _ in range(22):
         oldname = random.choice(names)
         newname = fix(model, oldname)
-        print newname
+        print(newname)
 
 
 def learn(lines):
     model = {}
     for line in lines:
         line = " " + line + " "
-        for i in xrange(0, len(line)-3):
+        for i in range(0, len(line)-3):
             trigram = line[i:i+3]
             index = trigram[0] + chartype(trigram[1]) + trigram[2]
 
@@ -52,7 +52,7 @@ def fix(model, name):
     name = " " + name + " "
 
     trigrams = []
-    for i in xrange(len(name)-2):
+    for i in range(len(name)-2):
         trigrams.append(name[i:i+3])
 
     while True:

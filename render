@@ -34,8 +34,8 @@ def main():
     # seeing JPEG artifacts when uploading an opaque png8, so adjust
     # the opacity of pixel (0,0) to force a PNG.
     alpha = Image.new("L", canvas.size)
-    for x in xrange(alpha.size[0]):
-        for y in xrange(alpha.size[1]):
+    for x in range(alpha.size[0]):
+        for y in range(alpha.size[1]):
             alpha.putpixel((x, y), 255)
     alpha.putpixel((0, 0), 254)
 
